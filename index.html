@@ -588,9 +588,10 @@
     async function init() {
       try {
         const [qRes, aRes] = await Promise.all([
-          fetch('./quiz_extracted.txt'),
-          fetch('./CSA_ANSWERS.txt')
-        ]);
+        fetch('./quiz_extracted.txt'),
+        fetch('./CSA_ANSWERS_LETTERS.txt')
+    ]);
+
         const [qText, aText] = await Promise.all([qRes.text(), aRes.text()]);
         questions = parseQuestions(qText);
         answers = parseAnswers(aText);
