@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSA Quick Quiz (347 Q)</title>
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --accent: #22c55e;
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --danger: #ef4444;
+      --warn: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 10% 20%, #1f2937, #0f172a);
+      color: var(--text);
+    }
+    .shell {
+      max-width: 1000px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      padding: 18px 18px 24px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .title { font-size: 20px; font-weight: 700; }
+    .pill {
+      background: #1f2937;
+      padding: 6px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin: 8px 0;
+    }
+    button, input {
+      font: inherit;
+    }
+    button {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button.secondary { background: #1f2937; color: var(--text); }
+    button.ghost { background: transparent; border-color: #334155; color: var(--muted); }
+    button:hover:not(:disabled) { transform: translateY(-1px); }
+    .card {
+      background: #0b1220;
+      border: 1px solid #1f2937;
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 10px;
+    }
+    .q-num { color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+    .q-text { font-size: 18px; font-weight: 600; margin-bottom: 14px; }
+    .options { display: grid; gap: 10px; }
+    .opt {
+      border: 1px solid #1f2937;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #0f172a;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      cursor: pointer;
+      transition: 0.12s ease;
+    }
+    .opt:hover { border-color: var(--primary); }
+    .opt input { margin: 0; }
+    .opt.correct { border-color: var(--accent); background: rgba(34,197,94,0.08); }
+    .opt.wrong { border-color: var(--danger); background: rgba(239,68,68,0.08); }
+    .feedback { margin-top: 10px; font-size: 14px; }
+    .feedback.ok { color: var(--accent); }
+    .feedback.bad { color: var(--danger); }
+    .issues { margin-top: 16px; }
+    .issues h3 { margin: 0 0 8px; }
+    .issue-item {
+      padding: 10px;
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      background: #0f172a;
+      font-size: 13px;
+    }
+    .muted { color: var(--muted); }
+    .go { display: flex; gap: 8px; align-items: center; }
+    .go input {
+      width: 90px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid #334155;
+      background: #0f172a;
+      color: var(--text);
+    }
+    .tabs { display: flex; gap: 8px; margin-top: 6px; }
+    .tab-btn { padding: 8px 12px; border-radius: 10px; border: 1px solid #334155; background: #111827; color: var(--muted); cursor: pointer; }
+    .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    /* Modal */
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      padding: 16px;
+    }
+    .modal {
+      width: min(960px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      background: #0b1220;
+      border: 1px solid #1f2937;
+      border-radius: 16px;
+      box-shadow: 0 20px 70px rgba(0,0,0,0.45);
+      padding: 16px;
+    }
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .modal h2 { margin: 0; }
+    .close { cursor: pointer; color: var(--muted); font-size: 20px; }
+    .issue-block {
+      border: 1px solid #1f2937;
+      background: #0f172a;
+      border-radius: 12px;
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+    .pill-warn {
+      background: rgba(245,158,11,0.15);
+      color: #fbbf24;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      display: inline-block;
+    }
+    .pill-bad {
+      background: rgba(239,68,68,0.15);
+      color: #ef4444;
+      padding: 4px 8px;
+      border-radius: 8px;
+      font-size: 12px;
+      display: inline-block;
+    }
+    .opt-line { margin-left: 8px; }
+    .correct { color: var(--accent); }
+    .wrong { color: var(--danger); }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="title">CSA Quick Quiz (347)</div>
+      <div class="pill" id="statusPill">Loading…</div>
+    </header>
+
+    <div class="row">
+      <div class="pill" id="positionPill">Q - / -</div>
+      <div class="pill">Score <span id="score">0 / 0</span></div>
+      <div class="pill">Mistakes <span id="mistakeCount">0</span></div>
+    </div>
+
+    <div class="row go">
+      <label for="goInput" class="muted">Go to #</label>
+      <input id="goInput" type="number" min="1" value="1">
+      <button class="secondary" id="goBtn">Go</button>
+      <button class="secondary" id="issuesBtn">Issues</button>
+      <button class="secondary" id="retakeBtn">Retake Issues</button>
+    </div>
+
+    <div class="card">
+      <div class="q-num" id="multiHint"></div>
+      <div class="q-text" id="qText">Loading…</div>
+      <div class="options" id="opts"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="feedback muted" id="feedbackDetail"></div>
+      <div class="row" style="margin-top:12px;">
+        <button class="secondary" id="prevBtn">Prev</button>
+        <button class="secondary" id="nextBtn">Next</button>
+        <button class="secondary" id="exitIssuesBtn" style="display:none;">Exit Issues</button>
+      </div>
+    </div>
+
+    <div class="card issues" id="issuesCard" style="display:none;">
+      <h3>Issues (<span id="issuesCount">0</span>)</h3>
+      <div id="issuesList" class="muted">No mistakes yet.</div>
+    </div>
+  </div>
+
+  <!-- Issues modal -->
+  <div class="backdrop" id="issuesModal">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>⚠️ Your Weak Points</h2>
+        <span class="close" id="closeModal">×</span>
+      </div>
+      <div class="pill-warn" id="issuesSummary">You have 0 weak point(s)</div>
+      <p class="muted">These are questions you've gotten wrong at least once. Review them and retake to improve.</p>
+      <div id="issuesDetail"></div>
+      <button class="secondary" id="modalRetake">Retake Missed Questions</button>
+    </div>
+  </div>
+
+  <script>
+    // Quick data holders
+    let questions = [];
+    let answers = [];
+    let current = 0;
+    let score = 0;
+    let attempts = 0;
+    let issues = [];
+    let retakeQueue = [];
+    let inRetake = false;
+    let evaluated = new Set(); // tracks which questions have been graded
+
+    const positionPill = document.getElementById('positionPill');
+    const scoreEl = document.getElementById('score');
+    const mistakeEl = document.getElementById('mistakeCount');
+    const qTextEl = document.getElementById('qText');
+    const optsEl = document.getElementById('opts');
+    const feedbackEl = document.getElementById('feedback');
+    const multiHintEl = document.getElementById('multiHint');
+    const statusPill = document.getElementById('statusPill');
+    const issuesCard = document.getElementById('issuesCard');
+    const issuesList = document.getElementById('issuesList');
+    const exitIssuesBtn = document.getElementById('exitIssuesBtn');
+    const issuesCount = document.getElementById('issuesCount');
+    const feedbackDetail = document.getElementById('feedbackDetail');
+    const issuesModal = document.getElementById('issuesModal');
+    const issuesDetail = document.getElementById('issuesDetail');
+    const issuesSummary = document.getElementById('issuesSummary');
+
+    // Parse quiz_extracted.txt into structured questions
+    function parseQuestions(text) {
+      const lines = text.split(/\r?\n/);
+      const out = [];
+      let i = 0;
+      while (i < lines.length) {
+        const qm = lines[i].match(/^(\d+)\.\s*(.*)$/);
+        if (qm) {
+          let qText = qm[2].trim();
+          i++;
+          while (i < lines.length && !/^[A-Z]\.\s/.test(lines[i]) && !/^\d+\.\s/.test(lines[i])) {
+            qText += ' ' + lines[i].trim();
+            i++;
+          }
+          const opts = [];
+          while (i < lines.length) {
+            const om = lines[i].match(/^([A-Z])\.\s*(.*)$/);
+            if (!om) break;
+            let optText = om[2].trim();
+            i++;
+            while (i < lines.length && !/^[A-Z]\.\s/.test(lines[i]) && !/^\d+\.\s/.test(lines[i])) {
+              optText += ' ' + lines[i].trim();
+              i++;
+            }
+            opts.push(optText);
+          }
+          out.push({ q: qText, opts });
+        } else {
+          i++;
+        }
+      }
+      return out;
+    }
+
+    // Parse CSA_ANSWERS.txt (Qn: Answer = X, Y)
+    function parseAnswers(text) {
+      const map = [];
+      const letterMap = l => l.charCodeAt(0) - 65;
+      const re = /^Q(\d+):\s*Answer\s*=\s*(.+)$/gm;
+      let m;
+      while ((m = re.exec(text)) !== null) {
+        const n = parseInt(m[1], 10);
+        const letters = m[2].replace(/\s+/g, '').split(/[+,/]/).filter(Boolean);
+        const idx = letters.map(letterMap);
+        map[n] = idx.length === 1 ? idx[0] : idx;
+      }
+      return map;
+    }
+
+    function lettersFromIndices(ans) {
+      const toL = i => String.fromCharCode(65 + i);
+      return Array.isArray(ans) ? ans.map(toL).join(', ') : toL(ans);
+    }
+
+    function isMulti(ans) {
+      return Array.isArray(ans);
+    }
+
+    function loadQuestion(idx) {
+      const q = questions[idx];
+      const ans = answers[idx + 1]; // answers are 1-based
+      positionPill.textContent = inRetake
+        ? `Issue ${retakeQueue.indexOf(idx) + 1} / ${retakeQueue.length}`
+        : `Q ${idx + 1} / ${questions.length}`;
+      qTextEl.textContent = q.q;
+      feedbackEl.textContent = '';
+      feedbackEl.className = 'feedback';
+      feedbackDetail.textContent = '';
+      multiHintEl.textContent = isMulti(ans) ? 'Multi-select: choose all that apply' : '';
+      optsEl.innerHTML = '';
+      const inputType = isMulti(ans) ? 'checkbox' : 'radio';
+      q.opts.forEach((opt, i) => {
+        const id = `opt-${idx}-${i}`;
+        const wrap = document.createElement('label');
+        wrap.className = 'opt';
+        wrap.innerHTML = `
+          <input type="${inputType}" name="answer" value="${i}" id="${id}">
+          <span><strong>${String.fromCharCode(65 + i)}.</strong> ${opt}</span>
+        `;
+        optsEl.appendChild(wrap);
+      });
+      if (inRetake) {
+        statusPill.textContent = `Retake ${retakeQueue.indexOf(idx) + 1} / ${retakeQueue.length}`;
+        exitIssuesBtn.style.display = 'inline-block';
+      } else {
+        statusPill.textContent = 'Ready';
+        exitIssuesBtn.style.display = 'none';
+      }
+    }
+
+    function getSelection() {
+      const ans = answers[current + 1];
+      if (isMulti(ans)) {
+        const checked = Array.from(document.querySelectorAll('input[name="answer"]:checked')).map(i => parseInt(i.value, 10));
+        return checked.sort((a, b) => a - b);
+      } else {
+        const sel = document.querySelector('input[name="answer"]:checked');
+        return sel ? parseInt(sel.value, 10) : null;
+      }
+    }
+
+    function arraysEqual(a, b) {
+      if (!Array.isArray(a) || !Array.isArray(b)) return false;
+      if (a.length !== b.length) return false;
+      return a.every((v, i) => v === b[i]);
+    }
+
+    function recordIssue(selection, correct) {
+      const existing = issues.find(it => it.idx === current);
+      const rec = {
+        idx: current,
+        q: questions[current].q,
+        chosen: selection,
+        correct,
+        lastMissed: new Date().toLocaleString()
+      };
+      if (existing) {
+        Object.assign(existing, rec);
+      } else {
+        issues.push(rec);
+      }
+      mistakeEl.textContent = issues.length;
+      renderIssues();
+    }
+
+    function renderIssues() {
+      if (!issues.length) {
+        issuesList.innerHTML = '<span class="muted">No mistakes yet.</span>';
+        issuesCount.textContent = '0';
+        return;
+      }
+      issuesCount.textContent = issues.length;
+      issuesList.innerHTML = issues.map((it, idx) => {
+        return `<div class="issue-item">
+          <div><strong>${idx + 1} / ${issues.length} • Q${it.idx + 1}:</strong> ${questions[it.idx].q}</div>
+          <div class="muted">Your answer: ${lettersFromIndices(it.chosen)} | Correct: ${lettersFromIndices(it.correct)}</div>
+          <div class="row" style="margin-top:6px;">
+            <button class="ghost" onclick="jumpTo(${it.idx})">Review</button>
+            <button class="ghost" onclick="removeIssue(${it.idx})">Remove</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    function removeIssue(idx) {
+      issues = issues.filter(it => it.idx !== idx);
+      retakeQueue = retakeQueue.filter(i => i !== idx);
+      mistakeEl.textContent = issues.length;
+      renderIssues();
+      if (issuesModal.style.display === 'flex') renderIssuesModal();
+      if (inRetake && !retakeQueue.length) {
+        inRetake = false;
+        statusPill.textContent = 'Done retake';
+        exitIssuesBtn.style.display = 'none';
+      }
+    }
+
+    function renderIssuesModal() {
+      if (!issues.length) {
+        issuesSummary.textContent = 'You have 0 weak point(s)';
+        issuesDetail.innerHTML = '<span class="muted">No mistakes yet.</span>';
+        return;
+      }
+      issuesSummary.textContent = `You have ${issues.length} weak point(s)`;
+      issuesDetail.innerHTML = issues.map((it, idx) => {
+        const opts = questions[it.idx].opts.map((t, i) => {
+          const letter = String.fromCharCode(65 + i);
+          const isCorrect = (Array.isArray(it.correct) ? it.correct : [it.correct]).includes(i);
+          const wasChosen = (Array.isArray(it.chosen) ? it.chosen : [it.chosen]).includes(i);
+          const state = isCorrect ? 'correct' : wasChosen ? 'wrong' : '';
+          return `<div class="opt-line ${state}">${letter}. ${t}</div>`;
+        }).join('');
+        return `<div class="issue-block">
+          <div class="row" style="justify-content: space-between; align-items:center;">
+            <div><strong>Question ${it.idx + 1}</strong></div>
+            <div class="row" style="gap:6px; align-items:center;">
+              <span class="pill-bad">Missed at least once</span>
+              <button class="ghost" onclick="removeIssue(${it.idx})">Remove</button>
+            </div>
+          </div>
+          <div style="margin:6px 0;">${questions[it.idx].q}</div>
+          <div><strong>Options:</strong></div>
+          ${opts}
+          <div class="correct" style="margin-top:6px;">Correct Answer: ${lettersFromIndices(it.correct)}</div>
+          <div class="muted">Your answer: ${lettersFromIndices(it.chosen)}</div>
+          <div class="muted">Last missed: ${it.lastMissed || ''}</div>
+          <div class="muted">Explanation: Not provided.</div>
+        </div>`;
+      }).join('');
+    }
+
+    function evaluateCurrent() {
+      if (evaluated.has(current)) return true; // already graded
+      const ans = answers[current + 1];
+      const selection = getSelection();
+      if (selection === null || (Array.isArray(selection) && !selection.length)) {
+        feedbackEl.textContent = 'Choose an option.';
+        feedbackEl.className = 'feedback bad';
+        return false;
+      }
+      attempts++;
+      const correct = isMulti(ans) ? ans.slice().sort((a,b)=>a-b) : ans;
+      const ok = isMulti(ans) ? arraysEqual(selection, correct) : selection === correct;
+      const expl = `Correct answer: ${lettersFromIndices(correct)}`;
+      // mark options
+      const chosenSet = Array.isArray(selection) ? new Set(selection) : new Set([selection]);
+      const correctSet = Array.isArray(correct) ? new Set(correct) : new Set([correct]);
+      document.querySelectorAll('label.opt').forEach((el, idx) => {
+        el.classList.remove('correct','wrong');
+        if (correctSet.has(idx)) el.classList.add('correct');
+        if (chosenSet.has(idx) && !correctSet.has(idx)) el.classList.add('wrong');
+      });
+      if (ok) {
+        score++;
+        feedbackEl.textContent = `Correct! ${expl}`;
+        feedbackEl.className = 'feedback ok';
+        feedbackDetail.textContent = `Your answer: ${lettersFromIndices(selection)}.`;
+        // if in retake and fixed it, remove from issues/retake queue
+        if (inRetake) {
+          issues = issues.filter(it => it.idx !== current);
+          retakeQueue = retakeQueue.filter(i => i !== current);
+          renderIssues();
+          mistakeEl.textContent = issues.length;
+          if (!retakeQueue.length) {
+            inRetake = false;
+            statusPill.textContent = 'Done retake';
+          }
+        } else {
+          // if previously marked wrong and now correct, clean it
+          issues = issues.filter(it => it.idx !== current);
+          renderIssues();
+          mistakeEl.textContent = issues.length;
+        }
+      } else {
+        recordIssue(selection, correct);
+        feedbackEl.textContent = `Wrong. ${expl}`;
+        feedbackEl.className = 'feedback bad';
+        feedbackDetail.innerHTML = `Your answer: ${lettersFromIndices(selection)}. ${expl}`;
+      }
+      scoreEl.textContent = `${score} / ${attempts}`;
+      evaluated.add(current);
+      return true;
+    }
+
+    function next() {
+      // First click grades and stops; second click moves on
+      if (!evaluated.has(current)) {
+        if (!evaluateCurrent()) return;
+        return;
+      }
+      if (inRetake && retakeQueue.length) {
+        const pos = retakeQueue.indexOf(current);
+        const nextIdx = retakeQueue[(pos + 1) % retakeQueue.length];
+        current = nextIdx;
+      } else {
+        current = Math.min(current + 1, questions.length - 1);
+      }
+      loadQuestion(current);
+    }
+    function prev() {
+      if (!evaluated.has(current)) {
+        if (!evaluateCurrent()) return;
+        return;
+      }
+      if (inRetake && retakeQueue.length) {
+        const pos = retakeQueue.indexOf(current);
+        const prevIdx = retakeQueue[(pos - 1 + retakeQueue.length) % retakeQueue.length];
+        current = prevIdx;
+      } else {
+        current = Math.max(current - 1, 0);
+      }
+      loadQuestion(current);
+    }
+    function jumpTo(idx) {
+      if (idx < 0 || idx >= questions.length) return;
+      current = idx;
+      loadQuestion(current);
+    }
+
+    // Event wiring
+    document.getElementById('nextBtn').onclick = next;
+    document.getElementById('prevBtn').onclick = prev;
+    document.getElementById('goBtn').onclick = () => {
+      const val = parseInt(document.getElementById('goInput').value, 10);
+      if (val >= 1 && val <= questions.length) jumpTo(val - 1);
+    };
+    document.getElementById('issuesBtn').onclick = () => {
+      renderIssuesModal();
+      issuesModal.style.display = 'flex';
+    };
+    document.getElementById('retakeBtn').onclick = () => {
+      if (!issues.length) {
+        alert('No mistakes to retake.');
+        return;
+      }
+      retakeQueue = issues.map(it => it.idx);
+      inRetake = true;
+      current = retakeQueue[0];
+      loadQuestion(current);
+      alert(`Retaking ${retakeQueue.length} missed questions.`);
+    };
+    document.getElementById('modalRetake').onclick = () => {
+      if (!issues.length) {
+        alert('No mistakes to retake.');
+        return;
+      }
+      issuesModal.style.display = 'none';
+      retakeQueue = issues.map(it => it.idx);
+      inRetake = true;
+      current = retakeQueue[0];
+      loadQuestion(current);
+    };
+    exitIssuesBtn.onclick = () => {
+      inRetake = false;
+      retakeQueue = [];
+      loadQuestion(current);
+    };
+    document.getElementById('closeModal').onclick = () => {
+      issuesModal.style.display = 'none';
+    };
+    issuesModal.addEventListener('click', (e) => {
+      if (e.target === issuesModal) issuesModal.style.display = 'none';
+    });
+
+    async function init() {
+      try {
+        const [qRes, aRes] = await Promise.all([
+          fetch('./quiz_extracted.txt'),
+          fetch('./CSA_ANSWERS.txt')
+        ]);
+        const [qText, aText] = await Promise.all([qRes.text(), aRes.text()]);
+        questions = parseQuestions(qText);
+        answers = parseAnswers(aText);
+        // Fill any missing answers with placeholder
+        for (let i = 1; i <= questions.length; i++) {
+          if (answers[i] === undefined) answers[i] = 0;
+        }
+        loadQuestion(0);
+        statusPill.textContent = 'Ready';
+      } catch (err) {
+        statusPill.textContent = 'Load failed';
+        qTextEl.textContent = 'Error loading quiz data.';
+        console.error(err);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
